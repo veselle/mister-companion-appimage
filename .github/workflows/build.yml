@@ -61,8 +61,8 @@ jobs:
         if: steps.check.outputs.exists == 'false'
         run: |
           chmod +x scripts/make-appimage.sh
-          scripts/make-appimage.sh extracted/x86_64/MiSTer-Companion x86_64 MiSTer-Companion-Linux-x86_64.AppImage "${{ github.repository }}"
-          scripts/make-appimage.sh extracted/arm64/MiSTer-Companion aarch64 MiSTer-Companion-Linux-ARM64.AppImage "${{ github.repository }}"
+          scripts/make-appimage.sh extracted/x86_64/MiSTer-Companion x86_64 MiSTer-Companion-Linux-x86_64.AppImage "${{ github.repository }}" "${{ steps.latest.outputs.tag }}"
+          scripts/make-appimage.sh extracted/arm64/MiSTer-Companion aarch64 MiSTer-Companion-Linux-ARM64.AppImage "${{ github.repository }}" "${{ steps.latest.outputs.tag }}"
           chmod +x MiSTer-Companion-Linux-x86_64.AppImage MiSTer-Companion-Linux-ARM64.AppImage
 
       - name: Create release

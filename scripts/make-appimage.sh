@@ -1,11 +1,13 @@
 #!/usr/bin/env bash
 # Builds a single AppImage from an extracted MiSTer Companion Linux binary.
 #
-# Usage: make-appimage.sh <binary-path> <appimage-arch> <output-path> <owner/repo>
+# Usage: make-appimage.sh <binary-path> <appimage-arch> <output-path> <owner/repo> <version>
 #   appimage-arch: value for appimagetool's ARCH env var (x86_64 | aarch64)
 #   owner/repo: this repo's GitHub slug, used for embedded update information
 #     (read by update checkers like Gear Lever); the release asset name is
 #     taken from the basename of <output-path>.
+#   version: upstream release tag, embedded as X-AppImage-Version in the
+#     desktop file -- the key Gear Lever reads to display an app's version.
 #
 # Also produces "<output-path>.zsync" alongside the AppImage (appimagetool
 # bundles its own zsyncmake). Gear Lever's embedded-update-info detection
@@ -18,6 +20,7 @@ BINARY_PATH="$1"
 APPIMAGE_ARCH="$2"
 OUTPUT_PATH="$3"
 OWNER_REPO="$4"
+VERSION="$5"
 
 OWNER="${OWNER_REPO%%/*}"
 REPO_NAME="${OWNER_REPO#*/}"
@@ -36,13 +39,14 @@ chmod +x "$APPDIR/usr/bin/mister-companion"
 curl -sL -o "$APPDIR/mister-companion.png" \
   "https://raw.githubusercontent.com/Anime0t4ku/mister-companion/main/mister-companion/assets/icon.png"
 
-cat > "$APPDIR/mister-companion.desktop" <<'EOF'
+cat > "$APPDIR/mister-companion.desktop" <<EOF
 [Desktop Entry]
 Name=MiSTer Companion
 Exec=mister-companion
 Icon=mister-companion
 Type=Application
 Categories=Utility;
+X-AppImage-Version=${VERSION}
 EOF
 
 cat > "$APPDIR/AppRun" <<'EOF'
