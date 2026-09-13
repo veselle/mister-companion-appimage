@@ -1,13 +1,22 @@
 #!/usr/bin/env bash
 # Builds a single AppImage from an extracted MiSTer Companion Linux binary.
 #
-# Usage: make-appimage.sh <binary-path> <appimage-arch> <output-path>
+# Usage: make-appimage.sh <binary-path> <appimage-arch> <output-path> <owner/repo>
 #   appimage-arch: value for appimagetool's ARCH env var (x86_64 | aarch64)
+#   owner/repo: this repo's GitHub slug, used for embedded update information
+#     (read by update checkers like Gear Lever); the release asset name is
+#     taken from the basename of <output-path>.
 set -euo pipefail
 
 BINARY_PATH="$1"
 APPIMAGE_ARCH="$2"
 OUTPUT_PATH="$3"
+OWNER_REPO="$4"
+
+OWNER="${OWNER_REPO%%/*}"
+REPO_NAME="${OWNER_REPO#*/}"
+RELEASE_FILENAME="$(basename "$OUTPUT_PATH")"
+UPDATE_INFO="gh-releases-zsync|${OWNER}|${REPO_NAME}|latest|${RELEASE_FILENAME}"
 
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT
@@ -61,4 +70,4 @@ if [ ! -x "$WORK_DIR/appimagetool.AppImage" ]; then
   chmod +x "$WORK_DIR/appimagetool.AppImage"
 fi
 
-ARCH="$APPIMAGE_ARCH" "$WORK_DIR/appimagetool.AppImage" "$APPDIR" "$OUTPUT_PATH"
+ARCH="$APPIMAGE_ARCH" "$WORK_DIR/appimagetool.AppImage" -u "$UPDATE_INFO" "$APPDIR" "$OUTPUT_PATH"
