@@ -32,8 +32,26 @@ EOF
 
 cat > "$APPDIR/AppRun" <<'EOF'
 #!/bin/sh
+# MiSTer Companion stores config.json next to its own executable and expects
+# that directory to be writable and stable across runs. The AppImage's squashfs
+# mount is read-only and gets a new path every launch, so copy the binary out
+# to a persistent, writable location and run it from there instead.
 HERE="$(dirname "$(readlink -f "${0}")")"
-exec "${HERE}/usr/bin/mister-companion" "$@"
+
+DATA_DIR="${XDG_DATA_HOME:-$HOME/.local/share}/mister-companion"
+mkdir -p "$DATA_DIR"
+
+SRC_BIN="$HERE/usr/bin/mister-companion"
+RUN_BIN="$DATA_DIR/mister-companion"
+
+if [ ! -x "$RUN_BIN" ] || ! cmp -s "$SRC_BIN" "$RUN_BIN"; then
+  cp "$SRC_BIN" "$RUN_BIN.new"
+  chmod +x "$RUN_BIN.new"
+  mv "$RUN_BIN.new" "$RUN_BIN"
+fi
+
+cd "$DATA_DIR"
+exec "$RUN_BIN" "$@"
 EOF
 chmod +x "$APPDIR/AppRun"
 
