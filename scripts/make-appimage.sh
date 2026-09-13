@@ -6,6 +6,12 @@
 #   owner/repo: this repo's GitHub slug, used for embedded update information
 #     (read by update checkers like Gear Lever); the release asset name is
 #     taken from the basename of <output-path>.
+#
+# Also produces "<output-path>.zsync" alongside the AppImage (appimagetool
+# bundles its own zsyncmake). Gear Lever's embedded-update-info detection
+# only recognizes gh-releases-zsync strings whose filename ends in ".zsync",
+# and it fetches that file's "SHA-1:" header to decide if an update exists
+# -- so the .zsync file must also be uploaded as a release asset.
 set -euo pipefail
 
 BINARY_PATH="$1"
@@ -16,7 +22,7 @@ OWNER_REPO="$4"
 OWNER="${OWNER_REPO%%/*}"
 REPO_NAME="${OWNER_REPO#*/}"
 RELEASE_FILENAME="$(basename "$OUTPUT_PATH")"
-UPDATE_INFO="gh-releases-zsync|${OWNER}|${REPO_NAME}|latest|${RELEASE_FILENAME}"
+UPDATE_INFO="gh-releases-zsync|${OWNER}|${REPO_NAME}|latest|${RELEASE_FILENAME}.zsync"
 
 WORK_DIR="$(mktemp -d)"
 trap 'rm -rf "$WORK_DIR"' EXIT

@@ -81,4 +81,6 @@ jobs:
             --title "$(jq -r .name upstream-release.json)" \
             --notes-file release-notes.md \
             MiSTer-Companion-Linux-x86_64.AppImage \
-            MiSTer-Companion-Linux-ARM64.AppImage
+            MiSTer-Companion-Linux-x86_64.AppImage.zsync \
+            MiSTer-Companion-Linux-ARM64.AppImage \
+            MiSTer-Companion-Linux-ARM64.AppImage.zsync
