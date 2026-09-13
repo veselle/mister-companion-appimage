@@ -1,0 +1,5 @@
+*.AppImage
+*.tar.gz
+upstream-release.json
+release-notes.md
+extracted/
